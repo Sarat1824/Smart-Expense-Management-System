@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0">Reports <small class="text-muted">{{month}}</small></h3>
+  <a class="btn btn-outline-primary" href="/reports/export.csv">Download CSV</a>
+  </div>
+
+<div class="row g-3">
+  <div class="col-md-6">
+    <div class="card h-100"><div class="card-body">
+      <h6 class="mb-3">Expenses vs Income vs Savings</h6>
+      <canvas id="mixPie" height="200"></canvas>
+      <script id="mix-data" type="application/json">{{ {'labels': labels, 'data': data}|tojson }}</script>
+    </div></div>
+  </div>
+  <div class="col-md-6">
+    <div class="card h-100"><div class="card-body">
+      <h6 class="mb-3">Totals</h6>
+      <ul class="list-group">
+        <li class="list-group-item d-flex justify-content-between"><span>Expenses</span><strong>₹ {{ '%.2f'|format(totals.expense) }}</strong></li>
+        <li class="list-group-item d-flex justify-content-between"><span>Income</span><strong>₹ {{ '%.2f'|format(totals.income) }}</strong></li>
+        <li class="list-group-item d-flex justify-content-between"><span>Savings</span><strong>₹ {{ '%.2f'|format(totals.savings) }}</strong></li>
+      </ul>
+    </div></div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  try {
+    const el = document.getElementById('mixPie');
+    const dataEl = document.getElementById('mix-data');
+    if (!el || !dataEl || typeof Chart === 'undefined') return;
+    const payload2 = JSON.parse(dataEl.textContent || '{}');
+    const values = Array.isArray(payload2.data) ? payload2.data : [];
+    if (!values.length || values.every(v => Number(v) === 0)) {
+      const note = document.createElement('div');
+      note.className = 'text-muted';
+      note.textContent = 'No data this month to render the chart.';
+      el.replaceWith(note);
+      return;
+    }
+    new Chart(el, {
+      type: 'pie',
+      data: { labels: payload2.labels, datasets: [{ data: values, backgroundColor: ['#e15759','#59a14f','#4e79a7'], borderWidth: 0 }] },
+      options: { plugins: { legend: { position: 'bottom' } } }
+    });
+  } catch (e) { /* swallow */ }
+});
+</script>
+{% endblock %}

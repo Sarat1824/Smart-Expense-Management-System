@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h3 class="mb-0">Budgets</h3>
+    </div>
+    <form method="post" class="row g-2 mb-4">
+      <div class="col-sm-4">
+        <label class="form-label">Month</label>
+        <input name="month" type="month" class="form-control" required>
+      </div>
+      <div class="col-sm-4">
+        <label class="form-label">Limit</label>
+        <input name="limit_amount" type="number" step="0.01" class="form-control" required>
+      </div>
+      <div class="col-sm-4 d-flex align-items-end">
+        <button class="btn btn-primary">Save</button>
+      </div>
+    </form>
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead><tr><th>Month</th><th>Limit</th><th>Spent</th></tr></thead>
+        <tbody>
+          {% for b in budgets %}
+          <tr><td>{{b.month}}</td><td>₹ {{'%.2f'|format(b.limit_amount)}}</td><td>₹ {{'%.2f'|format(b.spent_amount)}}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

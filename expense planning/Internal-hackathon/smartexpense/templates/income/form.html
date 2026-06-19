@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-body p-4">
+        <h3 class="mb-3">Add Income</h3>
+        <form method="post">
+          <div class="row g-3">
+            <div class="col-md-7"><label class="form-label">Title</label><input name="title" class="form-control" required></div>
+            <div class="col-md-5"><label class="form-label">Category</label>
+              <select name="category_id" class="form-select" required>
+                {% for c in categories %}
+                <option value="{{c.id}}">{{c.name}}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-4"><label class="form-label">Amount</label><input name="amount" type="number" step="0.01" class="form-control" required></div>
+            <div class="col-md-4"><label class="form-label">Payment Mode</label><input name="payment_mode" class="form-control" placeholder="Bank / Cash / UPI"></div>
+            <div class="col-md-4"><label class="form-label">Date</label><input name="spent_on" type="date" class="form-control"></div>
+            <div class="col-12"><label class="form-label">Note</label><textarea name="note" class="form-control" rows="3"></textarea></div>
+          </div>
+          <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-primary">Save</button>
+            <a class="btn btn-secondary" href="/income/">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

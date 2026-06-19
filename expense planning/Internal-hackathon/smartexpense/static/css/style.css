@@ -1,0 +1,124 @@
+:root {
+  --brand-primary: #1d4ed8; /* deeper blue for better contrast */
+  --brand-primary-hover: #173faa;
+  --brand-accent: #22b07d;
+}
+
+body {
+  background-color: #f6f7fb;
+  color: #111111;
+}
+
+.navbar-custom {
+  background: var(--brand-primary) !important;
+}
+.navbar-custom .navbar-brand,
+.navbar-custom .nav-link {
+  color: #fff !important;
+}
+
+.card {
+  border: 1px solid #d9dce3;
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(16, 24, 40, 0.08);
+  background-color: #ffffff;
+}
+
+.btn-primary {
+  background-color: var(--brand-primary);
+  border-color: var(--brand-primary);
+  color: #ffffff;
+}
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--brand-primary-hover);
+  border-color: var(--brand-primary-hover);
+  color: #ffffff;
+}
+.btn-outline-primary {
+  color: var(--brand-primary);
+  border-color: var(--brand-primary);
+}
+.btn-outline-primary:hover {
+  background-color: var(--brand-primary);
+  border-color: var(--brand-primary);
+  color: #ffffff;
+}
+
+.table thead th {
+  background-color: #f0f2f7;
+}
+.table-hover tbody tr:hover {
+  background-color: #f8f9fc;
+}
+
+/* Improve form focus visibility */
+.form-control:focus, .form-select:focus {
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 .2rem rgba(29, 78, 216, 0.25);
+}
+
+/* Ensure form text and caret are black */
+.form-control, .form-select, textarea, input, select, textarea::placeholder, input::placeholder {
+  color: #111111 !important;
+}
+textarea, input {
+  caret-color: #111111 !important;
+}
+/* Ensure selected text inside inputs is dark and readable */
+input::selection, textarea::selection {
+  color: #111111 !important;
+  background: #dbeafe !important; /* light blue */
+}
+
+.footer {
+  color: #6b7280;
+}
+
+/* Force input text (including autofill) to appear black */
+input[type="email"],
+input[type="password"],
+input,
+textarea {
+  color: #000 !important; /* text color */
+  -webkit-text-fill-color: #000 !important; /* fix for Chrome/Edge autofill */
+  caret-color: #000 !important; /* blinking cursor color */
+}
+
+/* Prevent browser autofill background from turning yellow */
+input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px white inset !important;
+  box-shadow: 0 0 0 1000px white inset !important;
+  background-color: white !important;
+}
+.welcome-animation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    animation: fadeOut 0.5s ease-out 1.5s forwards;
+}
+
+.welcome-message {
+    color: #6a0dad; /* Purple color */
+    font-size: 2.5rem;
+    font-weight: bold;
+    opacity: 0;
+    animation: fadeIn 0.5s ease-out 0.5s forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; visibility: hidden; }
+}

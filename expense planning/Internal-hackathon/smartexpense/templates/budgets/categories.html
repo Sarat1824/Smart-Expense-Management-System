@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h3 class="mb-0">Category Budgets</h3>
+  <form class="d-flex gap-2" method="get">
+    <input type="month" class="form-control" name="month" value="{{month}}">
+    <button class="btn btn-outline-primary">Go</button>
+  </form>
+</div>
+<div class="card">
+  <div class="card-body">
+    <form method="post" class="row g-2 mb-4">
+      <input type="hidden" name="month" value="{{month}}">
+      <div class="col-md-5">
+        <label class="form-label">Category</label>
+        <select class="form-select" name="category_id">
+          {% for c in categories %}
+            <option value="{{c.id}}">{{c.name}}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-5">
+        <label class="form-label">Limit</label>
+        <input class="form-control" type="number" name="limit_amount" step="0.01" required>
+      </div>
+      <div class="col-md-2 d-flex align-items-end">
+        <button class="btn btn-primary w-100">Save</button>
+      </div>
+    </form>
+
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead><tr><th>Category</th><th>Spent ({{month}})</th><th>Limit</th><th>Status</th></tr></thead>
+        <tbody>
+          {% for r in rows %}
+          <tr>
+            <td>{{r.category.name}}</td>
+            <td>₹ {{'%.2f'|format(r.spent)}}</td>
+            <td>{% if r.limit is not none %}₹ {{'%.2f'|format(r.limit)}}{% else %}<span class="text-muted">—</span>{% endif %}</td>
+            <td>
+              {% if r.status == 'over' %}
+                <span class="badge text-bg-danger">Over</span>
+              {% elif r.status == 'near' %}
+                <span class="badge text-bg-warning">Near</span>
+              {% elif r.status == 'ok' %}
+                <span class="badge text-bg-success">OK</span>
+              {% else %}
+                <span class="badge text-bg-light border">No limit</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0">Income</h3>
+  <a class="btn btn-primary" href="/income/create">Add Income</a>
+</div>
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead><tr><th>Title</th><th>Category</th><th>Amount</th><th>Payment</th><th>Date</th></tr></thead>
+        <tbody>
+          {% for e in income_rows %}
+          <tr>
+            <td>{{e.title}}</td>
+            <td>{{e.category.name}}</td>
+            <td>₹ {{'%.2f'|format(e.amount)}}</td>
+            <td>{{e.payment_mode}}</td>
+            <td>{{e.spent_on}}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-10">
+    <div class="card">
+      <div class="card-body p-4">
+        <h3 class="mb-3">{% if expense %}Edit Expense{% else %}Add Expenses (up to 3){% endif %}</h3>
+        <form method="post">
+          {% if expense %}
+            <div class="row g-3">
+              <div class="col-md-7"><label class="form-label">Title</label><input name="title" class="form-control" value="{{expense.title}}" required></div>
+              <div class="col-md-5"><label class="form-label">Category</label>
+                <select name="category_id" class="form-select" required>
+                  {% for c in categories %}
+                  <option value="{{c.id}}" {% if expense.category_id==c.id %}selected{% endif %}>{{c.name}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-4"><label class="form-label">Amount</label><input name="amount" type="number" step="0.01" class="form-control" value="{{expense.amount}}" required></div>
+              <div class="col-md-4"><label class="form-label">Payment Mode</label><input name="payment_mode" class="form-control" value="{{expense.payment_mode}}" placeholder="Cash / Card / UPI"></div>
+              <div class="col-md-4"><label class="form-label">Date</label><input name="spent_on" type="date" class="form-control" value="{{expense.spent_on}}"></div>
+              <div class="col-12"><label class="form-label">Note</label><textarea name="note" class="form-control" rows="3">{{expense.note}}</textarea></div>
+            </div>
+          {% else %}
+            {% for i in [1,2,3] %}
+            <fieldset class="border rounded-3 p-3 mb-3">
+              <legend class="float-none w-auto px-2 small text-muted">Expense {{i}}</legend>
+              <div class="row g-3">
+                <div class="col-md-5"><label class="form-label">Title</label><input name="title_{{i}}" class="form-control" placeholder="e.g., Lunch"></div>
+                <div class="col-md-3"><label class="form-label">Category</label>
+                  <select name="category_id_{{i}}" class="form-select">
+                    <option value="">Select</option>
+                    {% for c in categories %}
+                    <option value="{{c.id}}">{{c.name}}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col-md-2"><label class="form-label">Amount</label><input name="amount_{{i}}" type="number" step="0.01" class="form-control"></div>
+                <div class="col-md-2"><label class="form-label">Date</label><input name="spent_on_{{i}}" type="date" class="form-control"></div>
+                <div class="col-md-4"><label class="form-label">Payment</label><input name="payment_mode_{{i}}" class="form-control" placeholder="Cash / Card / UPI"></div>
+                <div class="col-md-8"><label class="form-label">Note</label><input name="note_{{i}}" class="form-control" placeholder="Optional"></div>
+              </div>
+            </fieldset>
+            {% endfor %}
+          {% endif %}
+          <div class="d-flex gap-2 mt-3">
+            <button class="btn btn-primary">Save</button>
+            <a class="btn btn-secondary" href="/expenses/">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+(function() {
+  const form = document.querySelector('form');
+  if (!form) return;
+
+  async function checkBudget(amount, category_id, spent_on) {
+    const res = await fetch('/expenses/check-budget', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount, category_id, spent_on })
+    });
+    try { return await res.json(); } catch (e) { return { ok: true }; }
+  }
+
+  function attachChangeAlertForEdit() {
+    const amount = document.querySelector('[name="amount"]');
+    const category = document.querySelector('[name="category_id"]');
+    const date = document.querySelector('[name="spent_on"]');
+    if (!amount || !category) return;
+    const handler = async () => {
+      const a = amount.value;
+      const c = category.value;
+      const d = date ? date.value : '';
+      if (!a || !c) return;
+      const result = await checkBudget(a, c, d);
+      if (!result.ok && result.message) alert(result.message);
+    };
+    amount.addEventListener('change', handler);
+    category.addEventListener('change', handler);
+  }
+
+  function attachChangeAlertForCreate() {
+    [1,2,3].forEach(i => {
+      const amount = document.querySelector(`[name="amount_${i}"]`);
+      const category = document.querySelector(`[name="category_id_${i}"]`);
+      const date = document.querySelector(`[name="spent_on_${i}"]`);
+      if (!amount || !category) return;
+      const handler = async () => {
+        const a = amount.value;
+        const c = category.value;
+        const d = date ? date.value : '';
+        if (!a || !c) return;
+        const result = await checkBudget(a, c, d);
+        if (!result.ok && result.message) alert(`Expense ${i}: ${result.message}`);
+      };
+      amount.addEventListener('change', handler);
+      category.addEventListener('change', handler);
+    });
+  }
+
+  async function validateOnSubmit(evt) {
+    let blocked = false;
+    const isEdit = !!document.querySelector('[name="amount"]') && !!document.querySelector('[name="category_id"]') && !document.querySelector('[name="amount_1"]');
+    if (isEdit) {
+      const amount = document.querySelector('[name="amount"]').value;
+      const category = document.querySelector('[name="category_id"]').value;
+      const date = (document.querySelector('[name="spent_on"]').value || '');
+      if (amount && category) {
+        const res = await checkBudget(amount, category, date);
+        if (!res.ok) {
+          alert(res.message || 'Amount exceeds budget');
+          blocked = true;
+        }
+      }
+    } else {
+      for (const i of [1,2,3]) {
+        const amountEl = document.querySelector(`[name="amount_${i}"]`);
+        const categoryEl = document.querySelector(`[name="category_id_${i}"]`);
+        const dateEl = document.querySelector(`[name="spent_on_${i}"]`);
+        if (!amountEl || !categoryEl) continue;
+        const a = amountEl.value;
+        const c = categoryEl.value;
+        const d = dateEl ? dateEl.value : '';
+        if (a && c) {
+          const res = await checkBudget(a, c, d);
+          if (!res.ok) {
+            alert(`Expense ${i}: ${res.message || 'Amount exceeds budget'}`);
+            blocked = true;
+          }
+        }
+      }
+    }
+    if (blocked) {
+      evt.preventDefault();
+      return false;
+    }
+    return true;
+  }
+
+  // Attach listeners
+  if (document.querySelector('[name="amount"]') && document.querySelector('[name="category_id"]')) {
+    attachChangeAlertForEdit();
+  } else {
+    attachChangeAlertForCreate();
+  }
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const ok = await validateOnSubmit(e);
+    if (ok) form.submit();
+  });
+})();
+</script>
+{% endblock %}
